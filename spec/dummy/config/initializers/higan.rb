@@ -1,6 +1,10 @@
 require 'higan'
 
 Higan.configure do
+  local {
+    temp_dir "#{Rails.root}/tmp/higan"
+  }
+
   ftp {
     host ENV['HIGAN_HOST']
     user ENV['HIGAN_USER']
@@ -21,4 +25,4 @@ Higan.configure do
   }
 end
 
-pp Higan.render_test
+Higan.write_temp

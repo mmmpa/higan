@@ -1,10 +1,14 @@
 module Higan
   module Configuration
     module ClassMethods
-      attr_accessor :ftp_configuration, :target_list, :default
+      attr_accessor :ftp_configuration, :target_list, :default,:local_configuration
 
       def configure(&block)
         instance_eval(&block) if block_given?
+      end
+
+      def local(&block)
+        self.local_configuration = LocalReceiver.out(&block)
       end
 
       def ftp(&block)
@@ -38,6 +42,11 @@ module Higan
     class TargetReceiver
       include ConfigurationReceiver
       receive :klass, :scope, :path, :renderer, :template, :value
+    end
+
+    class LocalReceiver
+      include ConfigurationReceiver
+      receive :temp_dir
     end
   end
 end

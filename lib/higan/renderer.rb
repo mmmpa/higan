@@ -14,6 +14,15 @@ module Higan
         }
       end
 
+      def write_temp
+        base = local_configuration[:temp_dir]
+        render.flatten.each do |target|
+          target_path = base + target.path
+          FileUtils.mkdir_p(File.dirname(target_path))
+          File.write(target_path, target.body)
+        end
+      end
+
       def detect_renderer(target)
         case
           when target.renderer
