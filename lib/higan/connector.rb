@@ -1,6 +1,10 @@
 module Higan
   module Connector
     module ClassMethods
+      def remote_file_path(path)
+        ftp_configuration[:base_dir] + path
+      end
+
       def test_connecting
         Session.new(**ftp_configuration) { |ftp|
           raise Fail if ftp.closed?
@@ -17,7 +21,19 @@ module Higan
       end
 
       def upload
-
+        dirs = Set.new
+        Session.new(**ftp_configuration) { |ftp, helper|
+          Uploading.all.each do |target|
+            target_path = remote_file_path(target.path)
+            dir = File.dirname(target_path)
+            unless dirs.include?(dir)
+              helper.mkdir_p(dir)
+              dirs.add(dir)
+            end
+            ftp.chdir(dir)
+            ftp.put(local_file_path(target.path), remote_file_path(target.path))
+          end
+        }
       end
     end
 

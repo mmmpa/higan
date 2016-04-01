@@ -1,6 +1,9 @@
 module Higan
   module Renderer
     module ClassMethods
+      def local_file_path(path)
+        local_configuration[:temp_dir] + path
+      end
 
       def render_test
         render
@@ -15,9 +18,8 @@ module Higan
       end
 
       def write_temp
-        base = local_configuration[:temp_dir]
         render.flatten.each do |target|
-          target_path = base + target.path
+          target_path = local_file_path(target.path)
           FileUtils.mkdir_p(File.dirname(target_path))
           File.write(target_path, target.body)
         end

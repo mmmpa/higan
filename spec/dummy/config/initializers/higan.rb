@@ -20,9 +20,10 @@ Higan.configure do
   add {
     klass Entry
     scope :all
-    path ->(entry) { "/entry/#{entry.title}.html" }
+    path ->(entry) { "/entry/#{entry.id}.html" }
     template "#{Rails.root}/app/views/entries/show.html.erb"
   }
 end
 
 Higan.write_temp
+Higan.upload
