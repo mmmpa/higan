@@ -30,12 +30,15 @@ module Higan
           renderer = detect_renderer(target)
           klass_name = target.klass.to_s
           target.record_list.map do |record|
-            Uploading.new(
+            key = [klass_name, record.id].join('::')
+            uploading = Uploading.find_by(key: key) || Uploading.new
+            uploading.update!(
               key: [klass_name, record.id].join('::'),
               path: target.path.call(record),
               body: renderer.call(record),
               source_updated_at: record.updated_at
             )
+            uploading
           end
         end
       end

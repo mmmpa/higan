@@ -5,6 +5,10 @@ class CreateHiganUploadings < ActiveRecord::Migration
 
       t.string :path, index: :unique
       t.string :body
+
+      t.boolean :locked, default: false, null: false
+      t.boolean :public, default: true, null: false
+
       t.datetime :uploaded_at
       t.datetime :source_updated_at
 
