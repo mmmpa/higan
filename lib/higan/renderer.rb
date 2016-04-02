@@ -2,11 +2,11 @@ module Higan
   module Renderer
     module ClassMethods
       def local_file_path(path)
-        local_configuration[:temp_dir] + path
+        basic[:temp_dir] + path
       end
 
-      def render_test
-        render
+      def render_test(name)
+        render(name)
       end
 
       def template_renderer(file)
@@ -17,8 +17,8 @@ module Higan
         }
       end
 
-      def write_temp
-        render.flatten.each do |target|
+      def write_temp(name)
+        render(name).flatten.each do |target|
           target_path = local_file_path(target.path)
           FileUtils.mkdir_p(File.dirname(target_path))
           File.write(target_path, target.body)
@@ -36,21 +36,20 @@ module Higan
         end
       end
 
-      def render
-        target_list.map do |target|
-          renderer = detect_renderer(target)
-          klass_name = target.klass.to_s
-          target.record_list.map do |record|
-            key = [klass_name, record.id].join('::')
-            uploading = Uploading.find_by(key: key) || Uploading.new
-            uploading.update!(
-              key: [klass_name, record.id].join('::'),
-              path: target.path.call(record),
-              body: renderer.call(record),
-              source_updated_at: record.updated_at
-            )
-            uploading
-          end
+      def render(name)
+        target = element_store[name]
+        renderer = detect_renderer(target)
+
+        target.element_list.map do |element|
+          key = target.key(element.id)
+          uploading = Uploading.find_by(key: key) || Uploading.new
+          uploading.update!(
+            key: key,
+            path: target.path.call(element),
+            body: renderer.call(element),
+            source_updated_at: element.updated_at
+          )
+          uploading
         end
       end
 

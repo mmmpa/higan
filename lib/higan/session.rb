@@ -25,6 +25,7 @@ module Higan
         end
         ftp.chdir(dir_name)
       end
+      ftp.chdir('/')
     end
   end
 end

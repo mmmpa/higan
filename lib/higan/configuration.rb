@@ -1,32 +1,40 @@
 module Higan
   module Configuration
     module ClassMethods
-      attr_accessor :ftp_configuration, :target_list, :default,:local_configuration
+      attr_accessor :basic, :ftp_store, :local_store, :element_store
 
       def configure(&block)
         instance_eval(&block) if block_given?
       end
 
-      def local(&block)
-        self.local_configuration = LocalReceiver.out(&block)
+      def add_ftp(name, &block)
+        ftp_store[name] = Remote.new(FtpReceiver.out(&block))
       end
 
-      def ftp(&block)
-        self.ftp_configuration = FtpReceiver.out(&block)
+      def base(&block)
+        self.basic = BaseReceiver.out(&block)
       end
 
-      def default(&block)
-        self.default = DefaultReceiver.out(&block)
+      def add_element(name, &block)
+        element_store[name] = Target.new(TargetReceiver.out(&block))
       end
 
-      def add(&block)
-        self.target_list ||= []
-        target_list.push(Target.new(TargetReceiver.out(&block)))
+      def inspect
+        {
+          basic: basic,
+          ftp: ftp_store,
+          local: local_store,
+          element: element_store
+        }
       end
     end
 
     def self.included(klass)
       klass.extend ClassMethods
+
+      klass.ftp_store = {}
+      klass.local_store = {}
+      klass.element_store = {}
     end
 
     class FtpReceiver
@@ -34,9 +42,9 @@ module Higan
       receive :host, :user, :password, :mode, :base_dir
     end
 
-    class DefaultReceiver
+    class BaseReceiver
       include ConfigurationReceiver
-      receive :public
+      receive :public, :temp_dir
     end
 
     class TargetReceiver

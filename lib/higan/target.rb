@@ -8,8 +8,12 @@ module Higan
       end
     end
 
-    def record_list
+    def element_list
       klass.send(scope)
+    end
+
+    def key(id)
+      [klass, id].join('::')
     end
   end
 end
