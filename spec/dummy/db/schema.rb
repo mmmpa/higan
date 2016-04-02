@@ -24,10 +24,12 @@ ActiveRecord::Schema.define(version: 20160331052054) do
     t.string   "key"
     t.string   "path"
     t.string   "body"
+    t.boolean  "locked",            default: false, null: false
+    t.boolean  "public",            default: true,  null: false
     t.datetime "uploaded_at"
     t.datetime "source_updated_at"
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
   end
 
   add_index "higan_uploadings", ["key"], name: "index_higan_uploadings_on_key"

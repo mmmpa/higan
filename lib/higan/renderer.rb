@@ -1,6 +1,9 @@
 module Higan
   module Renderer
     module ClassMethods
+      def local_file_path(path)
+        local_configuration[:temp_dir] + path
+      end
 
       def render_test
         render
@@ -12,6 +15,14 @@ module Higan
           view.assign({record: record})
           view.render(file: file)
         }
+      end
+
+      def write_temp
+        render.flatten.each do |target|
+          target_path = local_file_path(target.path)
+          FileUtils.mkdir_p(File.dirname(target_path))
+          File.write(target_path, target.body)
+        end
       end
 
       def detect_renderer(target)
