@@ -6,6 +6,7 @@ module Higan
   autoload :Configuration, 'higan/configuration'
   autoload :Renderer, 'higan/renderer'
   autoload :Connector, 'higan/connector'
+  autoload :Presenter, 'higan/presenter'
 
   # class
   autoload :Target, 'higan/target'
@@ -17,4 +18,5 @@ module Higan
   include Configuration
   include Renderer
   include Connector
+  include Presenter
 end

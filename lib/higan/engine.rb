@@ -1,6 +1,10 @@
+require 'slim-rails'
+
 module Higan
   class Engine < ::Rails::Engine
     isolate_namespace Higan
+
+    Slim::Engine.set_options pretty: false
 
     config.generators do |g|
       g.assets false

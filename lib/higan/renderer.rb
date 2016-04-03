@@ -1,6 +1,14 @@
 module Higan
   module Renderer
     module ClassMethods
+      def element_klass(name)
+        element_store[name].klass
+      end
+
+      def element_list(name)
+        element_store[name].element_list
+      end
+
       def local_file_path(path)
         basic[:temp_dir] + path
       end
@@ -34,6 +42,13 @@ module Higan
           else
             default_renderer(target.klass)
         end
+      end
+
+      def preview(name, id)
+        target = element_store[name]
+        renderer = detect_renderer(target)
+        element = target.element_list.find(id)
+        renderer.call(element)
       end
 
       def render(name)

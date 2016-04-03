@@ -1,0 +1,30 @@
+section.ftp-host
+  h1 FTP Host
+  - @ftp_data.each do |d|
+    h1= d.delete(:name)
+    table
+      - d.each_pair do |k,v|
+        tr
+          th= k
+          td= v
+
+section.local-host
+  h1 Local Host
+  - @local_data.each do |d|
+    h1= d.delete(:name)
+    table
+      - d.each_pair do |k,v|
+        tr
+          th= k
+          td= v
+
+section.element
+  h1 Element
+  - @element_data.each do |d|
+    h1
+      a href=element_path(d[:name]) = d[:name]
+    table
+      - d.each_pair do |k,v|
+        tr
+          th= k
+          td= v

@@ -21,10 +21,3 @@ Higan.configure do
     template "#{Rails.root}/app/views/entries/show.html.erb"
   end
 end
-
-p Higan
-pp Higan.write_temp(:entry)
-#p Higan.test_ftp(:main_host)
-#p Higan.test_uploading(:main_host)
-#p Higan.upload(:entry)
-pp Higan.upload(:entry).to(:main_host)

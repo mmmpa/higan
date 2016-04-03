@@ -4,6 +4,9 @@ module Higan
       attr_accessor :basic, :ftp_store, :local_store, :element_store
 
       def configure(&block)
+        self.ftp_store = {}
+        self.local_store = {}
+        self.element_store = {}
         instance_eval(&block) if block_given?
       end
 
@@ -31,10 +34,6 @@ module Higan
 
     def self.included(klass)
       klass.extend ClassMethods
-
-      klass.ftp_store = {}
-      klass.local_store = {}
-      klass.element_store = {}
     end
 
     class FtpReceiver

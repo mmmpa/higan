@@ -15,5 +15,12 @@ module Higan
     def key(id)
       [klass, id].join('::')
     end
+
+    def to_h
+      {
+        klass: klass,
+        scope: scope
+      }
+    end
   end
 end

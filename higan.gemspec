@@ -9,14 +9,15 @@ Gem::Specification.new do |s|
   s.version     = Higan::VERSION
   s.authors     = ["mmmpa"]
   s.email       = ["mmmpa.mmmpa@gmail.com"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of Higan."
-  s.description = "TODO: Description of Higan."
+  s.homepage    = "https://github.com/mmmpa/higan"
+  s.summary     = "Support making static HTML files from records."
+  s.description = "Support making static HTML files from records."
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
   s.add_dependency "rails", "~> 4.2.5.2"
+  s.add_dependency 'slim-rails'
 
   s.add_development_dependency "sqlite3"
 
