@@ -5,6 +5,10 @@ module Higan
 
       end
 
+      def development?
+        Rails.env == "development"
+      end
+
       def ftp_data
         ftp_store.each_pair.map do |k, v|
           {name: k}.merge!(v.to_h)
@@ -54,7 +58,7 @@ module Higan
         write_temp(name)
 
         target = element_store[name]
-        keys = target.element_list.map { |t| target.key(t.id) }
+        keys = target.element_list.map { |t| target.key(t.try(:id)) }
         elements = Uploading.where { (key.in keys) & ((uploaded_at == nil) | (source_updated_at > uploaded_at)) }
 
         pp elements
@@ -119,7 +123,7 @@ module Higan
       def preview(name, id)
         target = element_store[name]
         renderer = detect_renderer(target)
-        element = target.element_list.find(id)
+        element = target.pick(id)
         renderer.call(element)
       end
 
@@ -131,12 +135,16 @@ module Higan
         renderer = detect_renderer(target)
 
         target.element_list.map do |element|
-          key = target.key(element.id)
+          key = target.key(element.try(:id))
           uploading = Uploading.find_by(key: key) || Uploading.new
 
-          if uploading.source_updated_at && uploading.source_updated_at > element.updated_at
+          element_day = element.try(:updated_at)
+
+          if uploading.source_updated_at && element_day && uploading.source_updated_at > element_day
             next uploading
           end
+
+          p :update
 
           uploading.update!(
             key: key,

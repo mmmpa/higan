@@ -1,6 +1,6 @@
 module Higan
   class Target
-    attr_accessor :_klass, :scope, :path, :renderer, :template, :value
+    attr_accessor :_klass, :scope, :path, :renderer, :_template, :value
 
     def initialize(**params)
       params.each_pair do |k, v|
@@ -12,12 +12,20 @@ module Higan
       end
     end
 
+    def pick(id)
+      !!scope ?  element_list.find(id) : klass
+    end
+
     def element_list
-      klass.send(scope)
+      !!scope ? klass.send(scope) : [klass]
     end
 
     def klass
       Proc === _klass ? _klass.() : _klass
+    end
+
+    def template
+      Proc === _template ? _template.() : _template
     end
 
     def key(id)

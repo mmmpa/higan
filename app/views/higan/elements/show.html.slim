@@ -1,13 +1,16 @@
-= paginate @elements
-table
-  tr
-    - @columns.each do |c|
-      th= c
-
-  - @elements.each do |e|
+- if @paging
+  = paginate @elements
+  table
     tr
-      td
-        a href=preview_path(element_id: e.id) preview
       - @columns.each do |c|
-        td= e.send(c) rescue 'nil'
-= paginate @elements
+        th= c
+
+    - @elements.each do |e|
+      tr
+        td
+          a href=preview_path(element_id: e.id) preview
+        - @columns.each do |c|
+          td= e.send(c) rescue 'nil'
+  = paginate @elements
+- else
+  a href=preview_path(element_id: :klass) preview

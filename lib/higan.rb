@@ -15,8 +15,4 @@ module Higan
 
   include Configuration
   include Base
-
-  class << self
-    attr_accessor :basic, :ftp_store, :local_store, :element_store
-  end
 end

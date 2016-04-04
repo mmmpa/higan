@@ -4,11 +4,17 @@ module Higan
   class ElementsController < ApplicationController
     def show
       @columns = klass.column_names
-      @elements = elements.page(page).per(per)
+      @paging = true
+      @elements = if elements.respond_to?(:page)
+                    elements.page(page).per(per)
+                  else
+                    @paging = false
+                    elements
+                  end
     end
 
     def upload
-      Higan.upload(:entry).to(params[:element][:host].to_sym)
+      Higan.upload(params[:element_name].to_sym).to(params[:element][:host].to_sym)
       redirect_to states_path
     end
 
