@@ -1,17 +1,29 @@
 require 'net/ftp'
 
 module Higan
-
   class Session
-    attr_accessor :ftp
+    attr_accessor :ftp, :dirs
 
     def initialize(host:, user:, password:, mode: nil, **rest)
+      self.dirs = Set.new
+
       self.ftp = Net::FTP.new
       ftp.connect(host)
       ftp.login(user, password)
       ftp.binary = mode.to_sym == :binary
-      yield(ftp, self) if block_given?
+      yield(self) if block_given?
       ftp.close
+    end
+
+    def put(local, remote)
+      dir = File.dirname(remote)
+
+      unless dirs.include?(dir)
+        mkdir_p(dir)
+        dirs.add(dir)
+      end
+
+      ftp.put(local, remote)
     end
 
     def mkdir_p(path)

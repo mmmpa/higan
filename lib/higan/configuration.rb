@@ -1,12 +1,13 @@
 module Higan
   module Configurator
     module ClassMethods
-      attr_accessor :_basic, :_ftp_store, :_local_store, :_element_store
+      attr_accessor :_basic, :_ftp_store, :_local_store, :_element_store, :_file_store
 
       def init
         self._ftp_store = {}
         self._local_store = {}
         self._element_store = {}
+        self._file_store = {}
       end
 
       def add_ftp(name, &block)
@@ -21,25 +22,34 @@ module Higan
         _element_store[name] = block
       end
 
+      def add_file(name, &block)
+        _file_store[name] = block
+      end
+
       def configure
         basic = _basic
         ftp_store = _ftp_store
         local_store = _local_store
         element_store = _element_store
+        file_store = _file_store
 
         Higan.configure do
           base &basic
 
-          ftp_store.each_pair do |k,v|
+          ftp_store.each_pair do |k, v|
             add_ftp(k, &v)
           end
 
-          local_store.each_pair do |k,v|
+          local_store.each_pair do |k, v|
             add_local(k, &v)
           end
 
-          element_store.each_pair do |k,v|
+          element_store.each_pair do |k, v|
             add_element(k, &v)
+          end
+
+          file_store.each_pair do |k, v|
+            add_file(k, &v)
           end
         end
       end
@@ -59,11 +69,11 @@ module Higan
         return if configured
         self.configured = true unless development?
 
-        eval('::' + configurator).configure
+        configurator.constantize.configure
       end
 
-      def configuration(class_name)
-        self.configurator = class_name
+      def configuration(klass)
+        self.configurator = klass.to_s
       end
 
       def configure(&block)
@@ -74,15 +84,19 @@ module Higan
       end
 
       def add_ftp(name, &block)
-          ftp_store[name] = Remote.new(FtpReceiver.out(&block))
+        ftp_store[name] = Remote.new(FtpReceiver.out(&block))
       end
 
       def base(&block)
-          self.basic = BaseReceiver.out(&block)
+        self.basic = BaseReceiver.out(&block)
       end
 
       def add_element(name, &block)
-          element_store[name] = Target.new(TargetReceiver.out(&block))
+        element_store[name] = Target.new(TargetReceiver.out(&block))
+      end
+
+      def add_file(name, &block)
+        element_store[name] = FileTarget.new(FileTargetReceiver.out(&block))
       end
 
       def inspect
@@ -112,6 +126,11 @@ module Higan
     class TargetReceiver
       include ConfigurationReceiver
       receive :klass, :scope, :path, :renderer, :template, :value
+    end
+
+    class FileTargetReceiver
+      include ConfigurationReceiver
+      receive :files, :dir, :base_dir
     end
 
     class LocalReceiver

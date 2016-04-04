@@ -1,5 +1,5 @@
 class Entry < ActiveRecord::Base
-  scope :target, -> { where { id < 15 }.order { id.desc } }
+  scope :target, -> { order { id.desc } }
 
   def test
     :test

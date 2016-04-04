@@ -55,32 +55,53 @@ module Higan
       end
 
       def upload(name)
-        write_temp(name)
+        case element_store[name]
+          when Target
+            upload_rendered(name)
+          when FileTarget
+            upload_file(name)
+          else
+            nil
+        end
+      end
 
+      def upload_file(name)
         target = element_store[name]
-        keys = target.element_list.map { |t| target.key(t.try(:id)) }
-        elements = Uploading.where { (key.in keys) & ((uploaded_at == nil) | (source_updated_at > uploaded_at)) }
 
-        pp elements
+        elements = target.files.map do |path_string|
+          f = Pathname.new(path_string)
+          path = if target.base_dir
+                   path = f.dup.to_s
+                   path.slice!(target.base_dir.to_s)
+                   path
+                 else
+                   f.basename
+                 end
+          UploaderPart.new(local_file: f, path: target.dir + path)
+        end
 
         Uploader.new(elements)
       end
 
-      def to(ftp_name, elements)
-        config = ftp_store[ftp_name]
-        dirs = Set.new
-        Session.new(**config.to_h) { |ftp, helper|
-          elements.each do |target|
-            target_path = config.remote_path(target.path)
-            dir = File.dirname(target_path)
-            unless dirs.include?(dir)
-              helper.mkdir_p(dir)
-              dirs.add(dir)
-            end
-            #ftp.chdir(dir)
-            ftp.put(local_file_path(target.path), target_path)
+      def upload_rendered(name)
+        write_temp(name)
 
-            target.update!(uploaded_at: DateTime.now)
+        target = element_store[name]
+        keys = target.element_list.map { |t| target.key(t.try(:id)) }
+        elements = Uploading
+                     .where { (key.in keys) & ((uploaded_at == nil) | (source_updated_at > uploaded_at)) }
+                     .map { |e| UploaderPart.new(uploading: e, path: e.path, local_file: local_file_path(e.path)) }
+
+        Uploader.new(elements)
+      end
+
+      def to(ftp_name, uploader_parts)
+        config = ftp_store[ftp_name]
+        Session.new(**config.to_h) { |ftp|
+          uploader_parts.each do |part|
+            part.configure!(config) unless part.ok?
+            ftp.put(part.local_file, part.remote_file)
+            part.update!(uploaded_at: DateTime.now)
           end
         }
       end

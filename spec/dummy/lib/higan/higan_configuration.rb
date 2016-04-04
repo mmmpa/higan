@@ -26,4 +26,11 @@ class HiganConfiguration
     path ->(s) { '/entry/index.html' }
     template "#{Rails.root}/app/views/entries/index.html.slim"
   end
+
+
+  add_file :css do
+    files Dir[Rails.root.join('public', '**', '*.{html}').to_s]
+    base_dir Rails.root.join('public')
+    dir '/css'
+  end
 end
