@@ -1,15 +1,23 @@
 module Higan
   class Target
-    attr_accessor :klass, :scope, :path, :renderer, :template, :value
+    attr_accessor :_klass, :scope, :path, :renderer, :template, :value
 
     def initialize(**params)
       params.each_pair do |k, v|
-        self.send("#{k}=", v)
+        begin
+          self.send("#{k}=", v)
+        rescue
+          self.send("_#{k}=", v)
+        end
       end
     end
 
     def element_list
       klass.send(scope)
+    end
+
+    def klass
+      Proc === _klass ? _klass.() : _klass
     end
 
     def key(id)

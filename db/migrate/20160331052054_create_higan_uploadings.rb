@@ -8,6 +8,7 @@ class CreateHiganUploadings < ActiveRecord::Migration
 
       t.boolean :locked, default: false, null: false
       t.boolean :public, default: true, null: false
+      t.boolean :written, default: false, null: false
 
       t.datetime :uploaded_at
       t.datetime :source_updated_at

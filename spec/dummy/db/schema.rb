@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(version: 20160331052054) do
     t.string   "body"
     t.boolean  "locked",            default: false, null: false
     t.boolean  "public",            default: true,  null: false
+    t.boolean  "written",           default: false, null: false
     t.datetime "uploaded_at"
     t.datetime "source_updated_at"
     t.datetime "created_at",                        null: false

@@ -1,9 +1,9 @@
 section.ftp-host
   h1 FTP Host
   - @ftp_data.each do |d|
-    h1= d.delete(:name)
+    h1= d[:name]
     table
-      - d.each_pair do |k,v|
+      - d.each_pair do |k, v|
         tr
           th= k
           td= v
@@ -11,9 +11,9 @@ section.ftp-host
 section.local-host
   h1 Local Host
   - @local_data.each do |d|
-    h1= d.delete(:name)
+    h1= d[:name]
     table
-      - d.each_pair do |k,v|
+      - d.each_pair do |k, v|
         tr
           th= k
           td= v
@@ -23,8 +23,11 @@ section.element
   - @element_data.each do |d|
     h1
       a href=element_path(d[:name]) = d[:name]
+      = form_for :element, url: element_path(d[:name]), method: :post do |f|
+        = f.select :host, (@ftp_data + @local_data).map { |d| [d[:name], d[:name]] }
+        = f.submit :upload
     table
-      - d.each_pair do |k,v|
+      - d.each_pair do |k, v|
         tr
           th= k
           td= v

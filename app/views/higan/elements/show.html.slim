@@ -1,3 +1,4 @@
+= paginate @elements
 table
   tr
     - @columns.each do |c|
@@ -9,3 +10,4 @@ table
         a href=preview_path(element_id: e.id) preview
       - @columns.each do |c|
         td= e.send(c) rescue 'nil'
+= paginate @elements

@@ -1,8 +1,6 @@
 module Higan
   module Configuration
     module ClassMethods
-      attr_accessor :basic, :ftp_store, :local_store, :element_store
-
       def configure(&block)
         self.ftp_store = {}
         self.local_store = {}

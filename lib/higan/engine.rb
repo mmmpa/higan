@@ -1,4 +1,6 @@
 require 'slim-rails'
+require 'kaminari'
+require 'squeel'
 
 module Higan
   class Engine < ::Rails::Engine

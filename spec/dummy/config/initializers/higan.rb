@@ -15,8 +15,8 @@ Higan.configure do
   end
 
   add_element :entry do
-    klass Entry
-    scope :all
+    klass -> { Entry }
+    scope :target
     path ->(entry) { "/entry/#{entry.id}.html" }
     template "#{Rails.root}/app/views/entries/show.html.erb"
   end
