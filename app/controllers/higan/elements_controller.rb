@@ -14,7 +14,10 @@ module Higan
     end
 
     def upload
-      Higan.upload(params[:element_name].to_sym).to(params[:element][:host].to_sym)
+      Higan.upload(
+        params[:element_name].to_sym,
+        force: !!params[:element][:force])
+        .to(params[:element][:host].to_sym)
       redirect_to states_path
     end
 

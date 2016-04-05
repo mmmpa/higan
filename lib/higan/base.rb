@@ -54,10 +54,10 @@ module Higan
         true
       end
 
-      def upload(name)
+      def upload(name, force: false)
         case element_store[name]
           when Target
-            upload_rendered(name)
+            upload_rendered(name, force: force)
           when FileTarget
             upload_file(name)
           else
@@ -83,14 +83,26 @@ module Higan
         Uploader.new(elements)
       end
 
-      def upload_rendered(name)
-        write_temp(name)
+      def upload_rendered(name, force: false)
+        write_temp(name, force: force)
 
         target = element_store[name]
         keys = target.element_list.map { |t| target.key(t.try(:id)) }
-        elements = Uploading
-                     .where { (key.in keys) & ((uploaded_at == nil) | (source_updated_at > uploaded_at)) }
-                     .map { |e| UploaderPart.new(uploading: e, path: e.path, local_file: local_file_path(e.path)) }
+
+        base_elements = if force
+                          Uploading
+                            .where { key.in keys }
+                        else
+                          Uploading
+                            .where { (key.in keys) & ((uploaded_at == nil) | (source_updated_at > uploaded_at)) }
+                        end
+        elements = base_elements.map do |e|
+          UploaderPart.new(
+            uploading: e,
+            path: e.path,
+            local_file: local_file_path(e.path)
+          )
+        end
 
         Uploader.new(elements)
       end
@@ -151,7 +163,7 @@ module Higan
       #
       # render結果をDBに保持する
       #
-      def render(name)
+      def render(name, force: false)
         target = element_store[name]
         renderer = detect_renderer(target)
 
@@ -161,7 +173,7 @@ module Higan
 
           element_day = element.try(:updated_at)
 
-          if uploading.source_updated_at && element_day && uploading.source_updated_at > element_day
+          if !force && uploading.source_updated_at && element_day && uploading.source_updated_at > element_day
             next uploading
           end
 
@@ -181,8 +193,8 @@ module Higan
       #
       # render結果をファイルに書き出す
       #
-      def write_temp(name)
-        render(name).flatten.each do |target|
+      def write_temp(name, force: false)
+        render(name, force: force).flatten.each do |target|
           if target.written
             next
           end

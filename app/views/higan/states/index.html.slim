@@ -24,8 +24,14 @@ section.element
     h1
       a href=element_path(d[:name]) = d[:name]
       = form_for :element, url: element_path(d[:name]), method: :post do |f|
-        = f.select :host, (@ftp_data + @local_data).map { |d| [d[:name], d[:name]] }
-        = f.submit :upload
+        section
+          = f.select :host, (@ftp_data + @local_data).map { |d| [d[:name], d[:name]] }
+        section
+          label
+            = f.check_box :force, {}, true, nil
+            | 強制
+        section
+          = f.submit :upload
     table
       - d.each_pair do |k, v|
         tr
