@@ -1,17 +1,21 @@
-- if @paging
-  = paginate @elements
-  table
-    tr
-      th preview
-      - @columns.each do |c|
-        th= c
-
-    - @elements.each do |e|
+div.container
+  - if @paging
+    div.pagination
+      = paginate @elements
+    table.table.table-striped
       tr
-        td
-          a href=preview_path(element_id: e.id) preview
+        th preview
         - @columns.each do |c|
-          td= e.send(c) rescue 'nil'
-  = paginate @elements
-- else
-  a href=preview_path(element_id: :klass) preview
+          th= c
+
+      - @elements.each do |e|
+        tr
+          td
+            a href=preview_path(element_id: e.id) preview
+          - @columns.each do |c|
+            td= e.send(c) rescue 'nil'
+    div.pagination
+      = paginate @elements
+  - else
+    h1
+      a href=preview_path(element_id: :klass) preview
